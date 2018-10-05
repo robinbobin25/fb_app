@@ -1,8 +1,8 @@
 package fbApi;
 
 import io.restassured.response.Response;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,9 +12,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class TestPublishPost extends BaseApiTest {
 
-    @BeforeClass
-    public static void publishNewPostToPage() {
-        Response publishResponse = fbMethods.createPost(pageId, postMessage, pageAccessToken);
+    @Before
+    public void publishNewPostToPage() {
+        Response publishResponse = getFbMethods().createPost(getSettings().getPageId(), postMessage, getSettings().getAccessToken());
         createdPostId = publishResponse.jsonPath().get("id").toString();
     }
 
@@ -25,15 +25,16 @@ public class TestPublishPost extends BaseApiTest {
 
     @Test
     public void testPageFeedHasPublishedPostWithSentData() {
-        Response getFeedResponse = fbMethods.getPageFeed(pageId, pageAccessToken);
+        Response getFeedResponse = getFbMethods().getPageFeed(getSettings().getPageId(), getSettings().getAccessToken());
         assertThat(getFeedResponse).as("Feed response should have at least one post").hasNoNullFieldsOrProperties();
         assertThat(getFeedResponse.jsonPath().getList("data.id")).as("Feed response should contain the same published post id").containsOnlyOnce(createdPostId);
         assertThat(getFeedResponse.jsonPath().getList("data.message")).as("Feed response should contain the same published post message").containsOnlyOnce(postMessage);
     }
 
-    @AfterClass
-    public static void deleteCreatedPosts() {
-        fbMethods.deletePost(createdPostId, pageAccessToken);
+    @After
+    public void deleteCreatedPosts() {
+        Response deleteResponse = getFbMethods().deletePost(createdPostId, getSettings().getAccessToken());
+        assertThat(deleteResponse.jsonPath().get("success").toString()).as("The post should be deleted").isEqualTo("true");
     }
 
 }

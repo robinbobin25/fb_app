@@ -1,6 +1,6 @@
 package fbApi;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.TestSettings;
@@ -16,25 +16,21 @@ import java.util.Random;
  */
 abstract public class BaseApiTest {
 
-    static HttpFbApiClient fbMethods;
-    static String pageAccessToken;
-    static String pageId;
-    static String createdPostId;
-    static String postMessage;
+    private HttpFbApiClient fbMethods;
+    String createdPostId;
+    String postMessage;
 
-    private static TestSettings testSettings = null;
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseApiTest.class.getSimpleName());
+    private TestSettings testSettings = null;
+    private final Logger LOGGER = LoggerFactory.getLogger(BaseApiTest.class.getSimpleName());
 
-    @BeforeClass
-    public static void setup() {
+    @Before
+    public void setup() {
         loadTestSettings();
         fbMethods = new HttpFbApiClient();
-        pageAccessToken = testSettings.getAccessToken();
-        pageId = testSettings.getPageId();
         postMessage = generatePostMessage();
     }
 
-    private static void loadTestSettings() {
+    private void loadTestSettings() {
         Properties properties = new Properties();
         try (InputStream inputStream = new FileInputStream("src/test/resources/credentials.properties")) {
             properties.load(inputStream);
@@ -44,10 +40,16 @@ abstract public class BaseApiTest {
         }
     }
 
-    private static String generatePostMessage() {
+    private String generatePostMessage() {
         int randomNum = new Random().nextInt(100) + 1;
         return "This message #" + randomNum + " is sent by Graph API";
     }
 
+    TestSettings getSettings() {
+        return testSettings;
+    }
 
+    HttpFbApiClient getFbMethods() {
+        return fbMethods;
+    }
 }

@@ -7,6 +7,9 @@ import io.restassured.response.Response;
  */
 public class PublishResponse {
 
+    public PublishResponse(Response response) {
+    }
+
     public static String getPostId(Response response) {
         return response.jsonPath().get("id").toString();
     }

@@ -1,7 +1,7 @@
 package fbApi;
 
 import io.restassured.response.Response;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -14,23 +14,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 @FixMethodOrder(value = MethodSorters.NAME_ASCENDING)
 public class TestDeletePost extends BaseApiTest {
 
-    private static Response deleteResponse;
+    private Response deleteResponse;
 
-    @BeforeClass
-    public static void publishNewPostToPage() {
-        Response publishResponse = fbMethods.createPost(pageId, postMessage, pageAccessToken);
+    @Before
+    public void publishNewPostToPage() {
+        Response publishResponse = getFbMethods().createPost(getSettings().getPageId(), postMessage, getSettings().getAccessToken());
         createdPostId = publishResponse.jsonPath().get("id").toString();
-        deleteResponse = fbMethods.deletePost(createdPostId, pageAccessToken);
+        deleteResponse = getFbMethods().deletePost(createdPostId, getSettings().getAccessToken());
     }
 
     @Test
     public void testDeleteResponseIsValid() {
-        assertThat(deleteResponse.jsonPath().get("success").toString()).isNotEmpty().isEqualTo("true");
+        assertThat(deleteResponse.jsonPath().get("success").toString()).as("The post should be deleted with success").isNotEmpty().isEqualTo("true");
     }
 
     @Test
     public void testPageFeedDoesNotHavePost() {
-        Response getFeedResponse = fbMethods.getPageFeed(pageId, pageAccessToken);
+        Response getFeedResponse = getFbMethods().getPageFeed(getSettings().getPageId(), getSettings().getAccessToken());
         assertThat(getFeedResponse.jsonPath().getList("data.id")).as("Feed response should not contain the id of updated post").doesNotContain(createdPostId);
         assertThat(getFeedResponse.jsonPath().getList("data.message")).as("Feed response should not contain the updated message").doesNotContain(postMessage);
     }
