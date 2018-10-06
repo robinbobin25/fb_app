@@ -1,6 +1,9 @@
 package fbApi;
 
-import io.restassured.response.Response;
+import fbApi.data.PostData;
+import fbApi.responses.FeedResponse;
+import fbApi.responses.ModifyResponse;
+import fbApi.responses.PublishResponse;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -12,27 +15,25 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by Antonina Mikhaylenko on 10/5/2018.
  */
 @FixMethodOrder(value = MethodSorters.NAME_ASCENDING)
-public class TestDeletePost extends BaseApiTest {
+public class TestDeletePost extends BasePostTest {
 
-    private Response deleteResponse;
+    private String createdPostId;
 
     @Before
     public void publishNewPostToPage() {
-        Response publishResponse = getFbMethods().createPost(getSettings().getPageId(), postMessage, getSettings().getAccessToken());
-        createdPostId = publishResponse.jsonPath().get("id").toString();
-        deleteResponse = getFbMethods().deletePost(createdPostId, getSettings().getAccessToken());
+        PublishResponse publishResponse = getFbMethods().createPost(getSettings().getPageId(), postMessage, getSettings().getAccessToken());
+        assertThat(publishResponse.getStatusCode()).as("Status is not OK").isEqualTo(200);
+        createdPostId = publishResponse.getPostId();
     }
 
     @Test
-    public void testDeleteResponseIsValid() {
-        assertThat(deleteResponse.jsonPath().get("success").toString()).as("The post should be deleted with success").isNotEmpty().isEqualTo("true");
+    public void testPostWasDeletedFromPage() {
+        ModifyResponse deleteResponse = getFbMethods().deletePost(createdPostId, getSettings().getAccessToken());
+        assertThat(deleteResponse.getSuccess()).as("The post should be deleted with success").isTrue();
+        FeedResponse getFeedResponse = getFbMethods().getPageFeed(getSettings().getPageId(), getSettings().getAccessToken());
+        assertThat(getFeedResponse.getStatusCode()).as("Status is not OK").isEqualTo(200);
+        assertThat(getFeedResponse.getPostData()).as("Feed responses should not contain the id of updated post").doesNotContain(new PostData(postMessage, createdPostId));
     }
 
-    @Test
-    public void testPageFeedDoesNotHavePost() {
-        Response getFeedResponse = getFbMethods().getPageFeed(getSettings().getPageId(), getSettings().getAccessToken());
-        assertThat(getFeedResponse.jsonPath().getList("data.id")).as("Feed response should not contain the id of updated post").doesNotContain(createdPostId);
-        assertThat(getFeedResponse.jsonPath().getList("data.message")).as("Feed response should not contain the updated message").doesNotContain(postMessage);
-    }
 
 }

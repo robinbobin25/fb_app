@@ -3,14 +3,20 @@ package fbApi.responses;
 import io.restassured.response.Response;
 
 /**
- * Created by Antonina Mikhaylenko on 10/5/2018.
+ * Facebook returns this response
+ * when request POST https://graph.facebook.com/page_id/feed?message=message
  */
-public class PublishResponse {
+public class PublishResponse extends FbResponse {
+
+    private String id;
 
     public PublishResponse(Response response) {
+        super(response);
+        this.id = response.jsonPath().getString("id");
     }
 
-    public static String getPostId(Response response) {
-        return response.jsonPath().get("id").toString();
+    public String getPostId() {
+        return id;
     }
+
 }

@@ -1,17 +1,19 @@
 package fbApi;
 
-import io.restassured.response.Response;
+import fbApi.responses.FeedResponse;
+import fbApi.responses.ModifyResponse;
+import fbApi.responses.PublishResponse;
 
 /**
  * Created by Antonina Mikhaylenko on 10/5/2018.
  */
 public interface FbApiClient {
 
-    Response createPost(String pageId, String postMessage, String accessToken);
+    PublishResponse createPost(String pageId, String postMessage, String accessToken);
 
-    Response updatePost(String postId, String updateMessage, String accessToken);
+    ModifyResponse updatePost(String postId, String updateMessage, String accessToken);
 
-    Response deletePost(String postId, String accessToken);
+    ModifyResponse deletePost(String postId, String accessToken);
 
-    Response getPageFeed(String pageId, String accessToken);
+    FeedResponse getPageFeed(String pageId, String accessToken);
 }

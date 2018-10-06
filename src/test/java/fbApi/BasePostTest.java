@@ -3,7 +3,7 @@ package fbApi;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.TestSettings;
+import util.TestSettings;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,14 +14,13 @@ import java.util.Random;
 /**
  * Created by Antonina Mikhaylenko on 10/5/2018.
  */
-abstract public class BaseApiTest {
+abstract public class BasePostTest {
 
     private HttpFbApiClient fbMethods;
-    String createdPostId;
-    String postMessage;
-
     private TestSettings testSettings = null;
-    private final Logger LOGGER = LoggerFactory.getLogger(BaseApiTest.class.getSimpleName());
+    private final Logger LOGGER = LoggerFactory.getLogger(BasePostTest.class.getSimpleName());
+
+    String postMessage;
 
     @Before
     public void setup() {
